@@ -62,6 +62,17 @@ body.playing .arcade-wrap{max-width:640px;margin-inline:auto}
 .sudoku-modal{padding:15px;background:#243653;border:1px solid #6d89b4;border-radius:14px;text-align:center;margin-top:12px}
 .sudoku-modal button{margin:4px}
 @media(max-width:380px){.sudoku-numbers{gap:2px}.sudoku-tools button{font-size:12px;padding:8px}}
+
+.sudoku .cell.celebrate{animation:unitGlow .85s ease-in-out 1;background:#a4f4e1!important}
+.sudoku.victory{animation:boardWin 1.3s ease-in-out 2}
+@keyframes unitGlow{0%,100%{filter:brightness(1)}45%{filter:brightness(1.9);box-shadow:inset 0 0 16px #19d6b3}}
+@keyframes boardWin{0%,100%{box-shadow:0 0 0 #ffd86d}50%{box-shadow:0 0 28px 9px #ffd86d}}
+.sudoku-toast{min-height:22px;text-align:center;font-weight:800;color:#ffe08d;letter-spacing:.02em}
+.sudoku-victory{background:linear-gradient(155deg,#253b61,#163e4b);border:2px solid #e7c96b;border-radius:18px;padding:20px;text-align:center;box-shadow:0 0 24px #ffd65c33}
+.sudoku-victory h2{color:#ffe38d;font-size:clamp(23px,5vw,32px)}
+.sudoku-victory .big-reward{font-size:24px;font-weight:900;color:#7ff0d3}
+.sudoku-victory .detail{line-height:1.9}
+.sudoku-victory button{margin-top:12px}
 </style></head><body><header><div class="brand">🧠 BRAIN ARENA</div><select id="lang" aria-label="Language"><option value="ko">한국어</option><option value="en">English</option></select></header><main><section class="hero"><div class="muted" data-i="tag">전 세계가 함께 즐기는 두뇌 경쟁</div><h1 data-i="welcome">두뇌 아레나에 오신 걸 환영해요!</h1><p class="muted" data-i="subtitle">게임을 선택하고 기록에 도전하세요. 스마트폰에서 게임 아이콘을 눌러 바로 플레이하세요.</p></section><div class="games"><div class="game-card"><div><div class="emoji">🔢</div><h3 data-i="sudoku">스도쿠</h3><p data-i="sudokuDesc">빈칸을 채우고 정확도와 시간을 겨뤄요.</p></div><button class="primary" data-game="sudoku" data-i="start">시작하기</button></div><div class="game-card"><div><div class="emoji">🧩</div><h3 data-i="maze">미로 찾기</h3><p data-i="mazeDesc">방향키로 이동해 출구까지 탈출하세요.</p></div><button class="primary" data-game="maze" data-i="start">시작하기</button></div><div class="game-card"><div><div class="emoji">🧱</div><h3 data-i="blocks">블록 퍼즐</h3><p data-i="blocksDesc">떨어지는 블록으로 줄을 완성하세요.</p></div><button class="primary" data-game="blocks" data-i="start">시작하기</button></div></div><div class="settings"><label>🎚️ <span id="difficultyLabel">난이도</span> <select id="difficulty"><option value="easy">초급</option><option value="normal" selected>중급</option><option value="hard">고급</option></select></label><label>🎨 <span id="themeLabel">배경 테마</span> <select id="theme"><option value="dark">네온</option><option value="light">화이트</option><option value="forest">숲</option><option value="sunset">노을</option></select></label></div><div class="layout"><section class="panel"><nav class="game-nav" aria-label="게임 이동"><button type="button" id="homeNav">⌂ 메인</button><button type="button" id="gamesNav">▦ 게임 선택</button><button type="button" id="closeNav">✕ 닫기</button></nav><h2 id="gameTitle" data-i="choose">게임을 선택해 주세요</h2><div class="stats"><span class="stat"><span data-i="time">시간</span> <strong id="timer">00:00</strong></span><span class="stat"><span data-i="score">점수</span> <strong id="score">0</strong></span><span class="stat"><span data-i="mistakes">실수</span> <strong id="mistakes">0</strong></span></div><div id="playArea"><p class="muted" data-i="selectHint">위에서 게임을 선택하면 이곳에서 플레이할 수 있어요.</p></div><div id="extra"></div><div id="result"></div><div class="controls"><button id="restart" data-i="restart" disabled>다시 시작</button><button id="end" data-i="end" disabled>게임 종료</button></div><div class="notice" data-i="demo">현재는 로컬 체험판입니다. 실제 온라인 상대, 서버 점수 검증, 광고는 아직 연결되지 않았습니다.</div></section><aside class="panel"><h2 data-i="leaderboard">내 기록</h2><div class="muted" style="font-size:13px" data-i="local">이 브라우저에 저장된 최고 점수</div><ol id="records"></ol><hr style="border:0;border-top:1px solid #30405d;margin:20px 0"><div class="online"><h3 id="onlineTitle">🌐 온라인 대전 (시험 운영)</h3><div class="line"><input id="serverUrl" value="ws://localhost:8765" aria-label="서버 주소"><button id="connect">연결</button></div><div class="line"><input id="nickname" maxlength="16" placeholder="닉네임"><input id="roomCode" maxlength="12" placeholder="방 코드"><button id="joinRoom">방 입장</button></div><small id="onlineStatus">서버 미연결 · PC에서 server.py 실행 필요</small><div id="roomPlayers"></div><h4 id="worldTitle">서버 순위 (검증 전 테스트)</h4><ol id="worldRecords"></ol></div><h3 data-i="rules">대전 규칙 구상</h3><p class="muted" data-i="rulesDesc">같은 문제로 1:1부터 다인 대전까지. 실시간 진행 상황을 2~3초마다 공유하고, 종료 후 서버가 순위를 확정합니다.</p></aside></div><div class="foot">Brain Arena · Prototype v0.1 · Offline single-player demo</div></main><script>
 const T={ko:{tag:'전 세계가 함께 즐기는 두뇌 경쟁',welcome:'두뇌 아레나에 오신 걸 환영해요!',subtitle:'게임을 선택하고 기록에 도전하세요. 지금은 PC에서 즐기는 체험판입니다.',sudoku:'스도쿠',sudokuDesc:'빈칸을 채우고 정확도와 시간을 겨뤄요.',maze:'미로 찾기',mazeDesc:'방향키로 이동해 출구까지 탈출하세요.',blocks:'블록 퍼즐',blocksDesc:'떨어지는 블록으로 줄을 완성하세요.',start:'시작하기',choose:'게임을 선택해 주세요',time:'시간',score:'점수',mistakes:'실수',selectHint:'위에서 게임을 선택하면 이곳에서 플레이할 수 있어요.',restart:'다시 시작',end:'게임 종료',demo:'현재는 로컬 체험판입니다. 실제 온라인 상대, 서버 점수 검증, 광고는 아직 연결되지 않았습니다.',leaderboard:'내 기록',local:'이 브라우저에 저장된 최고 점수',rules:'대전 규칙 구상',rulesDesc:'같은 문제로 1:1부터 다인 대전까지. 실시간 진행 상황을 2~3초마다 공유하고, 종료 후 서버가 순위를 확정합니다.',win:'성공! 🎉',over:'게임 종료',retry:'다시 도전해 보세요!',erase:'지우기',move:'이동: 방향키 또는 아래 버튼',blockHelp:'← → 이동 · ↑ 회전 · ↓ 빠르게 · 스페이스 즉시 내리기',ad:'광고 표시 위치 (실제 광고 없음)',empty:'아직 기록이 없어요'},en:{tag:'A global brain competition',welcome:'Welcome to Brain Arena!',subtitle:'Choose a game and beat your best score. This is a local demo.',sudoku:'Sudoku',sudokuDesc:'Fill the grid accurately and quickly.',maze:'Maze',mazeDesc:'Reach the exit using arrow keys.',blocks:'Block Puzzle',blocksDesc:'Complete rows with falling blocks.',start:'Play',choose:'Choose a game',time:'Time',score:'Score',mistakes:'Mistakes',selectHint:'Select a game above to start playing.',restart:'Restart',end:'End game',demo:'This is a local demo. Online opponents, server validation and ads are not connected.',leaderboard:'My records',local:'Best scores saved in this browser',rules:'Multiplayer concept',rulesDesc:'Identical puzzles for 1v1 or groups. Share progress every 2–3 seconds; the server validates final results.',win:'You win! 🎉',over:'Game over',retry:'Try again!',erase:'Erase',move:'Move with arrow keys or buttons',blockHelp:'← → move · ↑ rotate · ↓ soft drop · Space hard drop',ad:'Ad placement (no real ads)',empty:'No records yet'}};
 let lang='ko',game=null,started=0,clock=null,elapsed=0,points=0,errors=0,cleanup=()=>{},done=false;const $=id=>document.getElementById(id),tr=k=>T[lang][k],area=$('playArea'),extra=$('extra');function setLang(v){lang=v;document.documentElement.lang=v;document.querySelectorAll('[data-i]').forEach(e=>e.textContent=tr(e.dataset.i));if(!game)$('gameTitle').textContent=tr('choose');else $('gameTitle').textContent=tr(game);renderRecords()}$('lang').onchange=e=>setLang(e.target.value);function tick(){elapsed=Math.floor((Date.now()-started)/1000);$('timer').textContent=String(Math.floor(elapsed/60)).padStart(2,'0')+':'+String(elapsed%60).padStart(2,'0')}function stats(){ $('score').textContent=points;$('mistakes').textContent=errors}function start(g){cleanup();clearInterval(clock);game=g;done=false;points=0;errors=0;elapsed=0;started=Date.now();$('timer').textContent='00:00';stats();$('gameTitle').textContent=tr(g);$('result').innerHTML='';area.innerHTML='';extra.innerHTML='';$('restart').disabled=false;$('end').disabled=false;clock=setInterval(tick,250);sendOnline({type:'progress',game:g,score:0});({sudoku:initSudoku,maze:initMaze,blocks:initBlocks})[g]()}function finish(win){if(done)return;done=true;tick();clearInterval(clock);cleanup();if(win){let list=JSON.parse(localStorage.getItem('brainArenaScores')||'[]');list.push({game,score:points,time:elapsed,date:new Date().toLocaleDateString()});localStorage.setItem('brainArenaScores',JSON.stringify(list.sort((a,b)=>b.score-a.score).slice(0,40)));renderRecords()}sendOnline({type:'finish',game,score:points,time:elapsed,won:win,difficulty:$('difficulty').value});$('result').innerHTML=`<div class="result"><h2>${tr(win?'win':'over')}</h2><p>${tr('score')}: ${points} · ${tr('time')}: ${$('timer').textContent}</p><p>${tr('ad')}</p></div>`;$('end').disabled=true}function renderRecords(){let list=JSON.parse(localStorage.getItem('brainArenaScores')||'[]');$('records').innerHTML=list.length?list.slice(0,8).map(x=>`<li>${tr(x.game)} · ${x.score}pt · ${x.time}s</li>`).join(''):`<li>${tr('empty')}</li>`}function openGame(g){document.body.classList.add('playing');start(g);window.scrollTo(0,0);const panel=document.querySelector('.layout>section.panel');if(panel)panel.scrollTop=0}
@@ -90,6 +101,50 @@ function initSudoku(){
  const tools=document.createElement('div');tools.className='sudoku-tools';extra.append(tools);
  const numbers=document.createElement('div');numbers.className='sudoku-numbers';extra.append(numbers);
  const modal=document.createElement('div');modal.className='sudoku-modal hidden';extra.append(modal);
+ const toast=document.createElement('div');toast.className='sudoku-toast';extra.prepend(toast);
+ let toastTimer=null,celebrateTimer=null;
+ const units=[];
+ for(let r=0;r<9;r++)units.push(Array.from({length:9},(_,c)=>r*9+c));
+ for(let c=0;c<9;c++)units.push(Array.from({length:9},(_,r)=>r*9+c));
+ for(let br=0;br<3;br++)for(let bc=0;bc<3;bc++)units.push(Array.from({length:9},(_,k)=>(br*3+Math.floor(k/3))*9+bc*3+k%3));
+ let completed=new Set(units.map((u,i)=>u.every(j=>values[j]===solution[j])?i:-1).filter(i=>i>=0));
+ let soundOn=localStorage.getItem('arenaSound')!=='off',effectsOn=localStorage.getItem('arenaEffects')!=='off',audioCtx=null;
+ function sound(f=600){if(!soundOn)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.type='sine';osc.frequency.setValueAtTime(f,audioCtx.currentTime);osc.frequency.exponentialRampToValueAtTime(f*1.35,audioCtx.currentTime+.14);gain.gain.setValueAtTime(.055,audioCtx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.28);osc.connect(gain);gain.connect(audioCtx.destination);osc.start();osc.stop(audioCtx.currentTime+.29)}catch(e){}}
+ function flashUnits(ids){if(!ids.length)return;clearTimeout(toastTimer);clearTimeout(celebrateTimer);const combo=ids.length;toast.textContent=combo===1?'✨ 한 구역 완성! +100점':combo===2?'🌟 더블 콤보! +250점':'🏆 '+combo+'연속 콤보! +'+(100+150*(combo-1))+'점';sound(550+combo*130);
+  if(effectsOn){const cells=new Set(ids.flatMap(id=>units[id]));cells.forEach(i=>board.children[i]?.classList.add('celebrate'));celebrateTimer=setTimeout(()=>cells.forEach(i=>board.children[i]?.classList.remove('celebrate')),850)}
+  toastTimer=setTimeout(()=>{toast.textContent=''},1600)
+ }
+ function checkUnits(){const newly=[];units.forEach((u,i)=>{if(!completed.has(i)&&u.every(j=>values[j]===solution[j])){completed.add(i);newly.push(i)}});if(newly.length){points+=100+150*(newly.length-1);flashUnits(newly)}}
+ function rewardFor(score){return score>=4000?50:score>=3000?30:score>=2000?20:score>=1000?10:5}
+ function completeSudoku(){const previous=JSON.parse(localStorage.getItem('brainArenaScores')||'[]').filter(x=>x.game==='sudoku'&&x.difficulty===$('difficulty').value);
+  const priorBest=previous.length?Math.max(...previous.map(x=>x.score)):null;
+  const priorFast=previous.length?Math.min(...previous.map(x=>x.time)):null;
+  points+=Math.max(0,3000-elapsed*5)-mistakes*25;
+  const record=priorBest!==null&&points>priorBest,fast=priorFast!==null&&elapsed<priorFast;
+  const perfect=mistakes===0;
+  const messages=[];
+  if(priorBest===null)messages.push('🎉 첫 완주! 멋진 출발이에요!');
+  if(record)messages.push('🏆 최고 점수 경신! 새로운 기록이에요!');
+  if(fast)messages.push('⚡ 최고 속도 경신! 이전보다 '+(priorFast-elapsed)+'초 빨라졌어요!');
+  if(perfect)messages.push('💎 퍼펙트 클리어! 실수 없이 성공했어요!');
+  if(!messages.length)messages.push(...['✨ 집중력 최고! 오늘도 멋진 도전이에요!','🌈 끝까지 해냈어요! 다음 기록도 기대돼요!','🎯 차근차근 완성한 멋진 승리예요!']);
+  const title=messages[Math.floor(Math.random()*messages.length)];
+  const today=new Date().toLocaleDateString('en-CA');const stored=JSON.parse(localStorage.getItem('arenaDailyRewards')||'{}');
+  const used=stored.date===today?stored.amount:0;const requested=rewardFor(points)+(record?10:0);const earned=Math.max(0,Math.min(requested,200-used));
+  localStorage.setItem('arenaDailyRewards',JSON.stringify({date:today,amount:used+earned}));
+  wallet+=earned;saveWallet();
+  draw();finish(true);
+  const result=$('result');result.replaceChildren();
+  const box=document.createElement('div');box.className='sudoku-victory';
+  const h=document.createElement('h2');h.textContent=title;box.append(h);
+  const p=document.createElement('p');p.className='detail';p.textContent='점수 '+points.toLocaleString()+'점 · 완료 '+Math.floor(elapsed/60)+'분 '+elapsed%60+'초 · 실수 '+mistakes+'회';box.append(p);
+  const reward=document.createElement('p');reward.className='big-reward';reward.textContent='🪙 +'+earned+'포인트 획득';box.append(reward);
+  const more=document.createElement('p');more.textContent=(record?'최고 점수 경신 보너스 포함 · ':'')+'오늘 보상 '+(used+earned)+'/200포인트'+(earned<requested?' · 일일 한도 적용':'');box.append(more);
+  const again=document.createElement('button');again.textContent='🎮 새 문제 도전';again.onclick=()=>start('sudoku');box.append(again);result.append(box);
+  if(effectsOn)board.classList.add('victory');sound(880);
+  result.scrollIntoView({behavior:effectsOn?'smooth':'auto',block:'center'});
+ }
+
  function snapshot(){undo.push({values:values.slice(),notes:notes.map(n=>[...n]),mistakes,points});if(undo.length>100)undo.shift()}
  function saveWallet(){localStorage.setItem('arenaCoins',String(wallet))}
  function update(){status.textContent='실수 '+mistakes+'/'+limit+'  ·  💡 힌트 '+hints+'  ·  🪙 포인트 '+wallet+'  ·  완성 '+values.filter(Boolean).length+'/81';stats()}
@@ -112,15 +167,15 @@ function initSudoku(){
  }
  function refreshTools(){tools.replaceChildren();
   const actions=[
-   ['↶ 실행 취소',()=>{if(!undo.length||locked)return;const old=undo.pop();old.values.forEach((v,i)=>values[i]=v);old.notes.forEach((n,i)=>notes[i]=new Set(n));mistakes=old.mistakes;points=old.points;draw()}],
+   ['↶ 실행 취소',()=>{if(!undo.length||locked)return;const old=undo.pop();old.values.forEach((v,i)=>values[i]=v);old.notes.forEach((n,i)=>notes[i]=new Set(n));mistakes=old.mistakes;points=old.points;completed=new Set(units.map((u,i)=>u.every(j=>values[j]===solution[j])?i:-1).filter(i=>i>=0));draw()}],
    ['⌫ 지우기',()=>enter(0)],
    ['✎ 메모 '+(noteMode?'ON':'OFF'),()=>{noteMode=!noteMode;refreshTools()}],
    ['💡 힌트',hint],
-   ['↻ 다시 시작',()=>{if(confirm('같은 문제를 처음부터 다시 시작할까요?'))reset()}]
+   ['🔊 소리 '+(soundOn?'ON':'OFF'),()=>{soundOn=!soundOn;localStorage.setItem('arenaSound',soundOn?'on':'off');refreshTools()}],['✨ 효과 '+(effectsOn?'ON':'OFF'),()=>{effectsOn=!effectsOn;localStorage.setItem('arenaEffects',effectsOn?'on':'off');refreshTools()}],['↻ 다시 시작',()=>{if(confirm('같은 문제를 처음부터 다시 시작할까요?'))reset()}]
   ];
   actions.forEach(([label,cb])=>{const b=document.createElement('button');b.textContent=label;b.onclick=cb;if(label.includes('메모')&&noteMode)b.classList.add('on');tools.append(b)})
  }
- function reset(){values.forEach((_,i)=>values[i]=given.has(i)?solution[i]:0);notes.forEach(n=>n.clear());selected=-1;mistakes=0;limit=3;hints=2;undo=[];locked=false;points=0;done=false;started=Date.now();elapsed=0;clearInterval(clock);clock=setInterval(tick,250);$('timer').textContent='00:00';modal.classList.add('hidden');refreshTools();draw()}
+ function reset(){completed=new Set(units.map((u,i)=>u.every(j=>given.has(j))?i:-1).filter(i=>i>=0));toast.textContent='';board.classList.remove('victory');values.forEach((_,i)=>values[i]=given.has(i)?solution[i]:0);notes.forEach(n=>n.clear());selected=-1;mistakes=0;limit=3;hints=2;undo=[];locked=false;points=0;done=false;started=Date.now();elapsed=0;clearInterval(clock);clock=setInterval(tick,250);$('timer').textContent='00:00';modal.classList.add('hidden');refreshTools();draw()}
  function offer(){locked=true;clearInterval(clock);modal.classList.remove('hidden');modal.replaceChildren();const p=document.createElement('p');p.textContent='실수 '+limit+'회! 이번 도전이 끝났어요. 같은 문제로 처음부터 다시 도전할 수 있어요.';modal.append(p);
   const retry=document.createElement('button');retry.textContent='↻ 같은 문제 다시 도전';retry.onclick=reset;modal.append(retry);
   const ad=document.createElement('button');ad.textContent='📺 광고 보고 재도전 (연결 준비 중)';ad.disabled=true;modal.append(ad);
@@ -135,14 +190,14 @@ function initSudoku(){
   if(n===0){snapshot();values[selected]=0;notes[selected].clear();draw();return}
   if(noteMode){snapshot();if(notes[selected].has(n))notes[selected].delete(n);else notes[selected].add(n);draw();return}
   if(values[selected]===n)return;
-  if(solution[selected]===n){snapshot();values[selected]=n;notes[selected].clear();points+=100;for(let i=0;i<81;i++)notes[i].delete(n);draw();
-   if(values.every((v,i)=>v===solution[i])){wallet+=20;saveWallet();points+=Math.max(0,3000-elapsed*5)-mistakes*25;draw();finish(true)}
+  if(solution[selected]===n){snapshot();values[selected]=n;notes[selected].clear();points+=100;for(let i=0;i<81;i++)notes[i].delete(n);draw();checkUnits();update();
+   if(values.every((v,i)=>v===solution[i]))completeSudoku()
   }else{snapshot();mistakes++;points=Math.max(0,points-20);draw();if(mistakes>=limit)offer()}
  }
  const buy=document.createElement('button');buy.textContent='➕ 실수 기회 +1 (100포인트, 최대 5회)';buy.onclick=()=>{buyLife();buy.disabled=limit>=5};extra.append(buy);
- const adInfo=document.createElement('p');adInfo.className='arcade-help';adInfo.textContent='광고 시청 및 현금 결제는 아직 연결 전입니다. 게임 완료 시 20포인트 지급 · 힌트 추가 50포인트';extra.append(adInfo);
+ const adInfo=document.createElement('p');adInfo.className='arcade-help';adInfo.textContent='광고 시청 및 현금 결제는 아직 연결 전입니다. 완료 점수에 따라 5~50포인트 · 신기록 +10 · 하루 최대 200 · 힌트 추가 50포인트';extra.append(adInfo);
  const key=e=>{if(game!=='sudoku'||done||locked)return;if(/^[1-9]$/.test(e.key))enter(+e.key);if(e.key==='Backspace'||e.key==='Delete')enter(0)};
- document.addEventListener('keydown',key);cleanup=()=>document.removeEventListener('keydown',key);
+ document.addEventListener('keydown',key);cleanup=()=>{document.removeEventListener('keydown',key);clearTimeout(toastTimer);clearTimeout(celebrateTimer)};
  refreshTools();draw()
 }
 // Maze arcade: static background, smoothly animated avatar.
