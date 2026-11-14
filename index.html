@@ -59,7 +59,7 @@ body.playing .arcade-wrap{max-width:640px;margin-inline:auto}
 .sudoku-numbers button small{display:block;font-size:11px;font-weight:500;color:#576e8f}
 .sudoku-numbers button.used{visibility:hidden}
 .sudoku-status{text-align:center;margin:8px 0;color:#a8d8f7;font-size:14px}
-.sudoku-modal{padding:15px;background:#243653;border:1px solid #6d89b4;border-radius:14px;text-align:center;margin-top:12px}
+.sudoku-modal{position:fixed;z-index:10000;top:50%;left:50%;transform:translate(-50%,-50%);width:min(92vw,420px);max-height:85vh;overflow:auto;padding:24px;background:#243653;border:2px solid #86f1dc;border-radius:18px;text-align:center;box-shadow:0 0 0 100vmax rgba(0,0,0,.72),0 15px 50px #000a}.sudoku-modal button{min-height:44px}
 .sudoku-modal button{margin:4px}
 @media(max-width:380px){.sudoku-numbers{gap:2px}.sudoku-tools button{font-size:12px;padding:8px}}
 
@@ -108,7 +108,9 @@ function initSudoku(){
  for(let c=0;c<9;c++)units.push(Array.from({length:9},(_,r)=>r*9+c));
  for(let br=0;br<3;br++)for(let bc=0;bc<3;bc++)units.push(Array.from({length:9},(_,k)=>(br*3+Math.floor(k/3))*9+bc*3+k%3));
  let completed=new Set(units.map((u,i)=>u.every(j=>values[j]===solution[j])?i:-1).filter(i=>i>=0));
- let soundOn=localStorage.getItem('arenaSound')!=='off',effectsOn=localStorage.getItem('arenaEffects')!=='off',audioCtx=null;
+ let soundOn=localStorage.getItem('arenaSound')!=='off',effectsOn=localStorage.getItem('arenaEffects')!=='off',vibrationOn=localStorage.getItem('arenaVibration')!=='off',audioCtx=null;
+ function vibrate(ms=12){if(vibrationOn&&navigator.vibrate)try{navigator.vibrate(ms)}catch(e){}}
+ function tapSound(kind){if(!soundOn)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();const now=audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=kind==='error'?'triangle':'sine';o.frequency.setValueAtTime(kind==='select'?780:kind==='error'?220:540,now);o.frequency.exponentialRampToValueAtTime(kind==='select'?450:kind==='error'?150:690,now+.065);g.gain.setValueAtTime(.035,now);g.gain.exponentialRampToValueAtTime(.001,now+.09);o.connect(g);g.connect(audioCtx.destination);o.start(now);o.stop(now+.095)}catch(e){}}
  function sound(f=600){if(!soundOn)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.type='sine';osc.frequency.setValueAtTime(f,audioCtx.currentTime);osc.frequency.exponentialRampToValueAtTime(f*1.35,audioCtx.currentTime+.14);gain.gain.setValueAtTime(.055,audioCtx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.28);osc.connect(gain);gain.connect(audioCtx.destination);osc.start();osc.stop(audioCtx.currentTime+.29)}catch(e){}}
  function flashUnits(ids){if(!ids.length)return;clearTimeout(toastTimer);clearTimeout(celebrateTimer);const combo=ids.length;toast.textContent=combo===1?'✨ 한 구역 완성! +100점':combo===2?'🌟 더블 콤보! +250점':'🏆 '+combo+'연속 콤보! +'+(100+150*(combo-1))+'점';sound(550+combo*130);
   if(effectsOn){const cells=new Set(ids.flatMap(id=>units[id]));cells.forEach(i=>board.children[i]?.classList.add('celebrate'));celebrateTimer=setTimeout(()=>cells.forEach(i=>board.children[i]?.classList.remove('celebrate')),850)}
@@ -158,7 +160,7 @@ function initSudoku(){
    b.setAttribute('aria-label',String(row+1)+'행 '+String(col+1)+'열 '+(n||'빈칸'));
    if(n)b.textContent=n;
    else if(notes[i].size){const grid=document.createElement('div');grid.className='notes';for(let k=1;k<=9;k++){const t=document.createElement('span');t.textContent=notes[i].has(k)?k:'';grid.append(t)}b.append(grid)}
-   b.onclick=()=>{if(!locked){selected=i;hintCell=-1;draw()}};
+   b.onclick=()=>{if(!locked){selected=i;hintCell=-1;tapSound('select');vibrate(8);draw()}};
    board.append(b)
   });
   numbers.replaceChildren();
@@ -171,13 +173,14 @@ function initSudoku(){
    ['⌫ 지우기',()=>enter(0)],
    ['✎ 메모 '+(noteMode?'ON':'OFF'),()=>{noteMode=!noteMode;refreshTools()}],
    ['💡 힌트',hint],
-   ['🔊 소리 '+(soundOn?'ON':'OFF'),()=>{soundOn=!soundOn;localStorage.setItem('arenaSound',soundOn?'on':'off');refreshTools()}],['✨ 효과 '+(effectsOn?'ON':'OFF'),()=>{effectsOn=!effectsOn;localStorage.setItem('arenaEffects',effectsOn?'on':'off');refreshTools()}],['↻ 다시 시작',()=>{if(confirm('같은 문제를 처음부터 다시 시작할까요?'))reset()}]
+   ['🔊 소리 '+(soundOn?'ON':'OFF'),()=>{soundOn=!soundOn;localStorage.setItem('arenaSound',soundOn?'on':'off');refreshTools()}],['✨ 효과 '+(effectsOn?'ON':'OFF'),()=>{effectsOn=!effectsOn;localStorage.setItem('arenaEffects',effectsOn?'on':'off');refreshTools()}],['📳 진동 '+(vibrationOn?'ON':'OFF'),()=>{vibrationOn=!vibrationOn;localStorage.setItem('arenaVibration',vibrationOn?'on':'off');refreshTools()}],['↻ 다시 시작',()=>{if(confirm('같은 문제를 처음부터 다시 시작할까요?'))reset()}]
   ];
   actions.forEach(([label,cb])=>{const b=document.createElement('button');b.textContent=label;b.onclick=cb;if(label.includes('메모')&&noteMode)b.classList.add('on');tools.append(b)})
  }
  function reset(){completed=new Set(units.map((u,i)=>u.every(j=>given.has(j))?i:-1).filter(i=>i>=0));toast.textContent='';board.classList.remove('victory');values.forEach((_,i)=>values[i]=given.has(i)?solution[i]:0);notes.forEach(n=>n.clear());selected=-1;mistakes=0;limit=3;hints=2;undo=[];locked=false;points=0;done=false;started=Date.now();elapsed=0;clearInterval(clock);clock=setInterval(tick,250);$('timer').textContent='00:00';modal.classList.add('hidden');refreshTools();draw()}
- function offer(){locked=true;clearInterval(clock);modal.classList.remove('hidden');modal.replaceChildren();const p=document.createElement('p');p.textContent='실수 '+limit+'회! 이번 도전이 끝났어요. 같은 문제로 처음부터 다시 도전할 수 있어요.';modal.append(p);
+ function offer(){locked=true;clearInterval(clock);modal.replaceChildren();modal.classList.remove('hidden');modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');const p=document.createElement('p');p.textContent='실수 '+limit+'회! 이번 도전이 끝났어요. 같은 문제로 처음부터 다시 도전할 수 있어요.';modal.append(p);
   const retry=document.createElement('button');retry.textContent='↻ 같은 문제 다시 도전';retry.onclick=reset;modal.append(retry);
+  const choose=document.createElement('button');choose.textContent='🎮 게임 선택으로 돌아가기';choose.onclick=()=>{modal.classList.add('hidden');$('end').click()};modal.append(choose);
   const ad=document.createElement('button');ad.textContent='📺 광고 보고 재도전 (연결 준비 중)';ad.disabled=true;modal.append(ad);
  }
  function buyLife(){if(locked||limit>=5)return;const cost=100;if(wallet<cost){alert('포인트가 부족해요. 실제 결제 기능은 아직 연결되지 않았어요.');return}wallet-=cost;saveWallet();limit++;update()}
@@ -190,9 +193,9 @@ function initSudoku(){
   if(n===0){snapshot();values[selected]=0;notes[selected].clear();draw();return}
   if(noteMode){snapshot();if(notes[selected].has(n))notes[selected].delete(n);else notes[selected].add(n);draw();return}
   if(values[selected]===n)return;
-  if(solution[selected]===n){snapshot();values[selected]=n;notes[selected].clear();points+=100;for(let i=0;i<81;i++)notes[i].delete(n);draw();checkUnits();update();
+  if(solution[selected]===n){tapSound('input');vibrate(15);snapshot();values[selected]=n;notes[selected].clear();points+=100;for(let i=0;i<81;i++)notes[i].delete(n);draw();checkUnits();update();
    if(values.every((v,i)=>v===solution[i]))completeSudoku()
-  }else{snapshot();mistakes++;points=Math.max(0,points-20);draw();if(mistakes>=limit)offer()}
+  }else{tapSound('error');vibrate(45);snapshot();mistakes++;points=Math.max(0,points-20);draw();if(mistakes>=limit)offer()}
  }
  const buy=document.createElement('button');buy.textContent='➕ 실수 기회 +1 (100포인트, 최대 5회)';buy.onclick=()=>{buyLife();buy.disabled=limit>=5};extra.append(buy);
  const adInfo=document.createElement('p');adInfo.className='arcade-help';adInfo.textContent='광고 시청 및 현금 결제는 아직 연결 전입니다. 완료 점수에 따라 5~50포인트 · 신기록 +10 · 하루 최대 200 · 힌트 추가 50포인트';extra.append(adInfo);
