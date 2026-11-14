@@ -252,7 +252,7 @@ function initEscape(){
   const desc=document.createElement('p');desc.textContent='주변을 살펴보고 숨겨진 출구가 있을 만한 물건을 선택하세요.';scene.append(desc);
   const objects=document.createElement('div');objects.className='escape-objects';scene.append(objects);
   current.objects.forEach(([icon,name],i)=>{const b=document.createElement('button');b.className='escape-object'+(selected===i?' selected':'');b.textContent=icon+' '+name;b.setAttribute('aria-pressed',String(selected===i));b.onclick=()=>{selected=i;info.textContent=name+'을(를) 살펴봤어요. 탈출구일 것 같다면 탈출 시도를 눌러보세요.';drawObjects()};objects.append(b)});
-  function drawObjects(){[...objects.children].forEach((b,i)=>{b.classList.toggle('selected',selected===i);b.setAttribute('aria-pressed',String(selected===i))})}
+  function drawObjects(){[...objects.children].forEach((b,i)=>{b.classList.toggle('selected',selected===i);b.setAttribute('aria-pressed',String(selected===i))});const attemptButton=actions.querySelector('.primary');if(attemptButton)attemptButton.disabled=selected<0||finished}
   actions.replaceChildren();
   const tryBtn=document.createElement('button');tryBtn.className='primary';tryBtn.textContent='🚪 탈출 시도';tryBtn.disabled=selected<0||finished;tryBtn.onclick=attempt;actions.append(tryBtn);
   const back=document.createElement('button');back.textContent='↶ 이전 방';back.disabled=room===0;back.onclick=()=>{info.textContent='이전 방으로 돌아왔어요.';enterRoom(room-1)};actions.append(back);
