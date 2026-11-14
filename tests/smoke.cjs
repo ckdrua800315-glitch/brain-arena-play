@@ -32,7 +32,7 @@ fs.mkdirSync('test-results', { recursive: true });
       await page.locator('#changeDifficultyNav').click();
       assert.equal(await page.locator('.sudoku-picker').count(), 1, 'no duplicate dialogs');
       await page.locator('.sudoku-picker button').last().click();
-      await page.locator('#closeGameNav').click();
+      await page.locator('#closeNav').click();
       await page.locator('[data-game="maze"]').click();
       assert.equal(await page.locator('.sudoku-picker').count(), 1, 'maze picker');
       await page.locator('.sudoku-picker select').selectOption('easy');
