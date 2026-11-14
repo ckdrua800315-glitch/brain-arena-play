@@ -44,6 +44,24 @@ body.playing .arcade-wrap{max-width:640px;margin-inline:auto}
  body.playing .stat{padding:6px;font-size:12px}
  body.playing .layout>section.panel{padding-top:max(8px,env(safe-area-inset-top))}
 }
+
+.sudoku .cell{position:relative;display:flex;align-items:center;justify-content:center;aspect-ratio:1;font-size:clamp(17px,4.5vw,27px);touch-action:manipulation}
+.sudoku .cell.peer{background:#eaf1fc}.sudoku .cell.same{background:#a7c9fb}.sudoku .cell.selected{background:#4c91eb!important;color:#fff!important}
+.sudoku .cell.hint-glow{animation:sudHint .7s ease-in-out 3;outline:3px solid #ffd052;z-index:2}
+@keyframes sudHint{50%{background:#ffe18b}}
+.sudoku .cell .notes{display:grid;grid-template-columns:repeat(3,1fr);width:100%;height:100%;align-items:center;font-size:clamp(7px,1.9vw,11px);font-weight:500;color:#587298}
+.sudoku .cell .notes span{text-align:center}
+.sudoku-tools{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:12px 0}
+.sudoku-tools button{font-size:13px;padding:9px 11px;min-height:42px}
+.sudoku-tools button.on{background:#158f80}
+.sudoku-numbers{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;width:100%;max-width:500px;margin:10px auto}
+.sudoku-numbers button{min-width:0;padding:7px 1px;border-radius:9px;background:#f1f5ff;color:#2460b5;font-size:clamp(17px,4vw,26px);font-weight:800;min-height:57px}
+.sudoku-numbers button small{display:block;font-size:11px;font-weight:500;color:#576e8f}
+.sudoku-numbers button.used{visibility:hidden}
+.sudoku-status{text-align:center;margin:8px 0;color:#a8d8f7;font-size:14px}
+.sudoku-modal{padding:15px;background:#243653;border:1px solid #6d89b4;border-radius:14px;text-align:center;margin-top:12px}
+.sudoku-modal button{margin:4px}
+@media(max-width:380px){.sudoku-numbers{gap:2px}.sudoku-tools button{font-size:12px;padding:8px}}
 </style></head><body><header><div class="brand">🧠 BRAIN ARENA</div><select id="lang" aria-label="Language"><option value="ko">한국어</option><option value="en">English</option></select></header><main><section class="hero"><div class="muted" data-i="tag">전 세계가 함께 즐기는 두뇌 경쟁</div><h1 data-i="welcome">두뇌 아레나에 오신 걸 환영해요!</h1><p class="muted" data-i="subtitle">게임을 선택하고 기록에 도전하세요. 스마트폰에서 게임 아이콘을 눌러 바로 플레이하세요.</p></section><div class="games"><div class="game-card"><div><div class="emoji">🔢</div><h3 data-i="sudoku">스도쿠</h3><p data-i="sudokuDesc">빈칸을 채우고 정확도와 시간을 겨뤄요.</p></div><button class="primary" data-game="sudoku" data-i="start">시작하기</button></div><div class="game-card"><div><div class="emoji">🧩</div><h3 data-i="maze">미로 찾기</h3><p data-i="mazeDesc">방향키로 이동해 출구까지 탈출하세요.</p></div><button class="primary" data-game="maze" data-i="start">시작하기</button></div><div class="game-card"><div><div class="emoji">🧱</div><h3 data-i="blocks">블록 퍼즐</h3><p data-i="blocksDesc">떨어지는 블록으로 줄을 완성하세요.</p></div><button class="primary" data-game="blocks" data-i="start">시작하기</button></div></div><div class="settings"><label>🎚️ <span id="difficultyLabel">난이도</span> <select id="difficulty"><option value="easy">초급</option><option value="normal" selected>중급</option><option value="hard">고급</option></select></label><label>🎨 <span id="themeLabel">배경 테마</span> <select id="theme"><option value="dark">네온</option><option value="light">화이트</option><option value="forest">숲</option><option value="sunset">노을</option></select></label></div><div class="layout"><section class="panel"><nav class="game-nav" aria-label="게임 이동"><button type="button" id="homeNav">⌂ 메인</button><button type="button" id="gamesNav">▦ 게임 선택</button><button type="button" id="closeNav">✕ 닫기</button></nav><h2 id="gameTitle" data-i="choose">게임을 선택해 주세요</h2><div class="stats"><span class="stat"><span data-i="time">시간</span> <strong id="timer">00:00</strong></span><span class="stat"><span data-i="score">점수</span> <strong id="score">0</strong></span><span class="stat"><span data-i="mistakes">실수</span> <strong id="mistakes">0</strong></span></div><div id="playArea"><p class="muted" data-i="selectHint">위에서 게임을 선택하면 이곳에서 플레이할 수 있어요.</p></div><div id="extra"></div><div id="result"></div><div class="controls"><button id="restart" data-i="restart" disabled>다시 시작</button><button id="end" data-i="end" disabled>게임 종료</button></div><div class="notice" data-i="demo">현재는 로컬 체험판입니다. 실제 온라인 상대, 서버 점수 검증, 광고는 아직 연결되지 않았습니다.</div></section><aside class="panel"><h2 data-i="leaderboard">내 기록</h2><div class="muted" style="font-size:13px" data-i="local">이 브라우저에 저장된 최고 점수</div><ol id="records"></ol><hr style="border:0;border-top:1px solid #30405d;margin:20px 0"><div class="online"><h3 id="onlineTitle">🌐 온라인 대전 (시험 운영)</h3><div class="line"><input id="serverUrl" value="ws://localhost:8765" aria-label="서버 주소"><button id="connect">연결</button></div><div class="line"><input id="nickname" maxlength="16" placeholder="닉네임"><input id="roomCode" maxlength="12" placeholder="방 코드"><button id="joinRoom">방 입장</button></div><small id="onlineStatus">서버 미연결 · PC에서 server.py 실행 필요</small><div id="roomPlayers"></div><h4 id="worldTitle">서버 순위 (검증 전 테스트)</h4><ol id="worldRecords"></ol></div><h3 data-i="rules">대전 규칙 구상</h3><p class="muted" data-i="rulesDesc">같은 문제로 1:1부터 다인 대전까지. 실시간 진행 상황을 2~3초마다 공유하고, 종료 후 서버가 순위를 확정합니다.</p></aside></div><div class="foot">Brain Arena · Prototype v0.1 · Offline single-player demo</div></main><script>
 const T={ko:{tag:'전 세계가 함께 즐기는 두뇌 경쟁',welcome:'두뇌 아레나에 오신 걸 환영해요!',subtitle:'게임을 선택하고 기록에 도전하세요. 지금은 PC에서 즐기는 체험판입니다.',sudoku:'스도쿠',sudokuDesc:'빈칸을 채우고 정확도와 시간을 겨뤄요.',maze:'미로 찾기',mazeDesc:'방향키로 이동해 출구까지 탈출하세요.',blocks:'블록 퍼즐',blocksDesc:'떨어지는 블록으로 줄을 완성하세요.',start:'시작하기',choose:'게임을 선택해 주세요',time:'시간',score:'점수',mistakes:'실수',selectHint:'위에서 게임을 선택하면 이곳에서 플레이할 수 있어요.',restart:'다시 시작',end:'게임 종료',demo:'현재는 로컬 체험판입니다. 실제 온라인 상대, 서버 점수 검증, 광고는 아직 연결되지 않았습니다.',leaderboard:'내 기록',local:'이 브라우저에 저장된 최고 점수',rules:'대전 규칙 구상',rulesDesc:'같은 문제로 1:1부터 다인 대전까지. 실시간 진행 상황을 2~3초마다 공유하고, 종료 후 서버가 순위를 확정합니다.',win:'성공! 🎉',over:'게임 종료',retry:'다시 도전해 보세요!',erase:'지우기',move:'이동: 방향키 또는 아래 버튼',blockHelp:'← → 이동 · ↑ 회전 · ↓ 빠르게 · 스페이스 즉시 내리기',ad:'광고 표시 위치 (실제 광고 없음)',empty:'아직 기록이 없어요'},en:{tag:'A global brain competition',welcome:'Welcome to Brain Arena!',subtitle:'Choose a game and beat your best score. This is a local demo.',sudoku:'Sudoku',sudokuDesc:'Fill the grid accurately and quickly.',maze:'Maze',mazeDesc:'Reach the exit using arrow keys.',blocks:'Block Puzzle',blocksDesc:'Complete rows with falling blocks.',start:'Play',choose:'Choose a game',time:'Time',score:'Score',mistakes:'Mistakes',selectHint:'Select a game above to start playing.',restart:'Restart',end:'End game',demo:'This is a local demo. Online opponents, server validation and ads are not connected.',leaderboard:'My records',local:'Best scores saved in this browser',rules:'Multiplayer concept',rulesDesc:'Identical puzzles for 1v1 or groups. Share progress every 2–3 seconds; the server validates final results.',win:'You win! 🎉',over:'Game over',retry:'Try again!',erase:'Erase',move:'Move with arrow keys or buttons',blockHelp:'← → move · ↑ rotate · ↓ soft drop · Space hard drop',ad:'Ad placement (no real ads)',empty:'No records yet'}};
 let lang='ko',game=null,started=0,clock=null,elapsed=0,points=0,errors=0,cleanup=()=>{},done=false;const $=id=>document.getElementById(id),tr=k=>T[lang][k],area=$('playArea'),extra=$('extra');function setLang(v){lang=v;document.documentElement.lang=v;document.querySelectorAll('[data-i]').forEach(e=>e.textContent=tr(e.dataset.i));if(!game)$('gameTitle').textContent=tr('choose');else $('gameTitle').textContent=tr(game);renderRecords()}$('lang').onchange=e=>setLang(e.target.value);function tick(){elapsed=Math.floor((Date.now()-started)/1000);$('timer').textContent=String(Math.floor(elapsed/60)).padStart(2,'0')+':'+String(elapsed%60).padStart(2,'0')}function stats(){ $('score').textContent=points;$('mistakes').textContent=errors}function start(g){cleanup();clearInterval(clock);game=g;done=false;points=0;errors=0;elapsed=0;started=Date.now();$('timer').textContent='00:00';stats();$('gameTitle').textContent=tr(g);$('result').innerHTML='';area.innerHTML='';extra.innerHTML='';$('restart').disabled=false;$('end').disabled=false;clock=setInterval(tick,250);sendOnline({type:'progress',game:g,score:0});({sudoku:initSudoku,maze:initMaze,blocks:initBlocks})[g]()}function finish(win){if(done)return;done=true;tick();clearInterval(clock);cleanup();if(win){let list=JSON.parse(localStorage.getItem('brainArenaScores')||'[]');list.push({game,score:points,time:elapsed,date:new Date().toLocaleDateString()});localStorage.setItem('brainArenaScores',JSON.stringify(list.sort((a,b)=>b.score-a.score).slice(0,40)));renderRecords()}sendOnline({type:'finish',game,score:points,time:elapsed,won:win,difficulty:$('difficulty').value});$('result').innerHTML=`<div class="result"><h2>${tr(win?'win':'over')}</h2><p>${tr('score')}: ${points} · ${tr('time')}: ${$('timer').textContent}</p><p>${tr('ad')}</p></div>`;$('end').disabled=true}function renderRecords(){let list=JSON.parse(localStorage.getItem('brainArenaScores')||'[]');$('records').innerHTML=list.length?list.slice(0,8).map(x=>`<li>${tr(x.game)} · ${x.score}pt · ${x.time}s</li>`).join(''):`<li>${tr('empty')}</li>`}function openGame(g){document.body.classList.add('playing');start(g);window.scrollTo(0,0);const panel=document.querySelector('.layout>section.panel');if(panel)panel.scrollTop=0}
@@ -54,7 +72,79 @@ $('homeNav').onclick=exitGame;$('gamesNav').onclick=exitGame;$('closeNav').oncli
 $('theme').onchange=e=>{document.body.dataset.theme=e.target.value;localStorage.setItem('arenaTheme',e.target.value)};$('theme').value=localStorage.getItem('arenaTheme')||'dark';document.body.dataset.theme=$('theme').value;$('difficulty').onchange=()=>{if(game)start(game)};
 
 // Sudoku: permuted valid solved board, seeded removal; mistakes counted on incorrect entries.
-function initSudoku(){const shuffle=a=>{for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};let base=[0,1,2],rows=shuffle(base.slice()).flatMap(b=>shuffle(base.slice()).map(r=>b*3+r)),cols=shuffle(base.slice()).flatMap(b=>shuffle(base.slice()).map(r=>b*3+r)),nums=shuffle([1,2,3,4,5,6,7,8,9]);let solution=rows.flatMap(r=>cols.map(c=>nums[(r*3+Math.floor(r/3)+c)%9]));let visible=new Set(shuffle(Array.from({length:81},(_,i)=>i)).slice(0,({easy:45,normal:35,hard:27}[$('difficulty').value]))),values=solution.map((n,i)=>visible.has(i)?n:0),selected=-1;let board=document.createElement('div');board.className='sudoku';area.append(board);function draw(){board.innerHTML='';values.forEach((n,i)=>{let b=document.createElement('button');b.className='cell'+(visible.has(i)?' fixed':'')+(selected===i?' selected':'');b.textContent=n||'';b.onclick=()=>{if(!done&&!visible.has(i)){selected=i;draw()}};board.append(b)})}function enter(n){if(done||selected<0||visible.has(selected))return;if(n===0){values[selected]=0;draw();return}if(solution[selected]===n){values[selected]=n;points+=100;stats();draw();if(values.every((v,i)=>v===solution[i])){points+=Math.max(0,3000-elapsed*5)-errors*25;stats();finish(true)}}else{errors++;points=Math.max(0,points-20);stats();draw()}}let numbers=document.createElement('div');numbers.className='numbers';for(let n=1;n<=9;n++){let b=document.createElement('button');b.textContent=n;b.onclick=()=>enter(n);numbers.append(b)}let er=document.createElement('button');er.textContent=tr('erase');er.onclick=()=>enter(0);numbers.append(er);extra.append(numbers);let key=e=>{if(game!=='sudoku'||done)return;if(/^[1-9]$/.test(e.key))enter(+e.key);if(e.key==='Backspace'||e.key==='Delete')enter(0)};document.addEventListener('keydown',key);cleanup=()=>document.removeEventListener('keydown',key);draw()}
+function initSudoku(){
+ const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+ const bands=shuffle([0,1,2]),stacks=shuffle([0,1,2]);
+ const rows=bands.flatMap(b=>shuffle([0,1,2]).map(r=>b*3+r));
+ const cols=stacks.flatMap(b=>shuffle([0,1,2]).map(c=>b*3+c));
+ const nums=shuffle([1,2,3,4,5,6,7,8,9]);
+ const solution=rows.flatMap(r=>cols.map(c=>nums[(r*3+Math.floor(r/3)+c)%9]));
+ const count=({easy:45,normal:35,hard:27}[$('difficulty').value]);
+ const given=new Set(shuffle(Array.from({length:81},(_,i)=>i)).slice(0,count));
+ const values=solution.map((n,i)=>given.has(i)?n:0);
+ const notes=Array.from({length:81},()=>new Set());
+ let selected=-1,noteMode=false,mistakes=0,limit=3,hints=2,undo=[],hintCell=-1,locked=false;
+ let wallet=Math.max(0,Number(localStorage.getItem('arenaCoins')||'0')||0);
+ const board=document.createElement('div');board.className='sudoku';area.append(board);
+ const status=document.createElement('div');status.className='sudoku-status';extra.append(status);
+ const tools=document.createElement('div');tools.className='sudoku-tools';extra.append(tools);
+ const numbers=document.createElement('div');numbers.className='sudoku-numbers';extra.append(numbers);
+ const modal=document.createElement('div');modal.className='sudoku-modal hidden';extra.append(modal);
+ function snapshot(){undo.push({values:values.slice(),notes:notes.map(n=>[...n]),mistakes,points});if(undo.length>100)undo.shift()}
+ function saveWallet(){localStorage.setItem('arenaCoins',String(wallet))}
+ function update(){status.textContent='실수 '+mistakes+'/'+limit+'  ·  💡 힌트 '+hints+'  ·  🪙 포인트 '+wallet+'  ·  완성 '+values.filter(Boolean).length+'/81';stats()}
+ function draw(){
+  board.replaceChildren();
+  values.forEach((n,i)=>{
+   const b=document.createElement('button');b.type='button';
+   const row=Math.floor(i/9),col=i%9,sr=Math.floor(selected/9),sc=selected%9;
+   const peer=selected>=0&&(row===sr||col===sc||(Math.floor(row/3)===Math.floor(sr/3)&&Math.floor(col/3)===Math.floor(sc/3)));
+   b.className='cell'+(given.has(i)?' fixed':'')+(peer?' peer':'')+(selected>=0&&n&&n===values[selected]?' same':'')+(selected===i?' selected':'')+(hintCell===i?' hint-glow':'');
+   b.setAttribute('aria-label',String(row+1)+'행 '+String(col+1)+'열 '+(n||'빈칸'));
+   if(n)b.textContent=n;
+   else if(notes[i].size){const grid=document.createElement('div');grid.className='notes';for(let k=1;k<=9;k++){const t=document.createElement('span');t.textContent=notes[i].has(k)?k:'';grid.append(t)}b.append(grid)}
+   b.onclick=()=>{if(!locked){selected=i;hintCell=-1;draw()}};
+   board.append(b)
+  });
+  numbers.replaceChildren();
+  for(let n=1;n<=9;n++){const remaining=9-values.filter(v=>v===n).length;const b=document.createElement('button');b.type='button';b.className=remaining===0?'used':'';b.innerHTML=n+'<small>'+remaining+'개</small>';b.disabled=locked||remaining===0;b.onclick=()=>enter(n);numbers.append(b)}
+  update()
+ }
+ function refreshTools(){tools.replaceChildren();
+  const actions=[
+   ['↶ 실행 취소',()=>{if(!undo.length||locked)return;const old=undo.pop();old.values.forEach((v,i)=>values[i]=v);old.notes.forEach((n,i)=>notes[i]=new Set(n));mistakes=old.mistakes;points=old.points;draw()}],
+   ['⌫ 지우기',()=>enter(0)],
+   ['✎ 메모 '+(noteMode?'ON':'OFF'),()=>{noteMode=!noteMode;refreshTools()}],
+   ['💡 힌트',hint],
+   ['↻ 다시 시작',()=>{if(confirm('같은 문제를 처음부터 다시 시작할까요?'))reset()}]
+  ];
+  actions.forEach(([label,cb])=>{const b=document.createElement('button');b.textContent=label;b.onclick=cb;if(label.includes('메모')&&noteMode)b.classList.add('on');tools.append(b)})
+ }
+ function reset(){values.forEach((_,i)=>values[i]=given.has(i)?solution[i]:0);notes.forEach(n=>n.clear());selected=-1;mistakes=0;limit=3;hints=2;undo=[];locked=false;points=0;done=false;started=Date.now();elapsed=0;clearInterval(clock);clock=setInterval(tick,250);$('timer').textContent='00:00';modal.classList.add('hidden');refreshTools();draw()}
+ function offer(){locked=true;clearInterval(clock);modal.classList.remove('hidden');modal.replaceChildren();const p=document.createElement('p');p.textContent='실수 '+limit+'회! 이번 도전이 끝났어요. 같은 문제로 처음부터 다시 도전할 수 있어요.';modal.append(p);
+  const retry=document.createElement('button');retry.textContent='↻ 같은 문제 다시 도전';retry.onclick=reset;modal.append(retry);
+  const ad=document.createElement('button');ad.textContent='📺 광고 보고 재도전 (연결 준비 중)';ad.disabled=true;modal.append(ad);
+ }
+ function buyLife(){if(locked||limit>=5)return;const cost=100;if(wallet<cost){alert('포인트가 부족해요. 실제 결제 기능은 아직 연결되지 않았어요.');return}wallet-=cost;saveWallet();limit++;update()}
+ function hint(){if(locked)return;const candidates=values.map((v,i)=>v?null:i).filter(i=>i!==null);if(!candidates.length)return;
+  if(hints<=0){if(wallet<50){alert('힌트가 부족해요. 포인트 50개로 추가할 수 있어요.');return}wallet-=50;saveWallet()}else hints--;
+  const i=selected>=0&&!values[selected]?selected:candidates[0];selected=i;hintCell=i;draw();setTimeout(()=>{if(game==='sudoku'){hintCell=-1;draw()}},2400);
+  const msg=document.createElement('p');msg.textContent='💡 반짝이는 칸의 정답은 '+solution[i]+'입니다.';modal.replaceChildren(msg);modal.classList.remove('hidden');setTimeout(()=>{if(!locked&&game==='sudoku')modal.classList.add('hidden')},3200)
+ }
+ function enter(n){if(locked||selected<0||given.has(selected))return;
+  if(n===0){snapshot();values[selected]=0;notes[selected].clear();draw();return}
+  if(noteMode){snapshot();if(notes[selected].has(n))notes[selected].delete(n);else notes[selected].add(n);draw();return}
+  if(values[selected]===n)return;
+  if(solution[selected]===n){snapshot();values[selected]=n;notes[selected].clear();points+=100;for(let i=0;i<81;i++)notes[i].delete(n);draw();
+   if(values.every((v,i)=>v===solution[i])){wallet+=20;saveWallet();points+=Math.max(0,3000-elapsed*5)-mistakes*25;draw();finish(true)}
+  }else{snapshot();mistakes++;points=Math.max(0,points-20);draw();if(mistakes>=limit)offer()}
+ }
+ const buy=document.createElement('button');buy.textContent='➕ 실수 기회 +1 (100포인트, 최대 5회)';buy.onclick=()=>{buyLife();buy.disabled=limit>=5};extra.append(buy);
+ const adInfo=document.createElement('p');adInfo.className='arcade-help';adInfo.textContent='광고 시청 및 현금 결제는 아직 연결 전입니다. 게임 완료 시 20포인트 지급 · 힌트 추가 50포인트';extra.append(adInfo);
+ const key=e=>{if(game!=='sudoku'||done||locked)return;if(/^[1-9]$/.test(e.key))enter(+e.key);if(e.key==='Backspace'||e.key==='Delete')enter(0)};
+ document.addEventListener('keydown',key);cleanup=()=>document.removeEventListener('keydown',key);
+ refreshTools();draw()
+}
 // Maze arcade: static background, smoothly animated avatar.
 function initMaze(){
  const N=({easy:13,normal:19,hard:27}[$('difficulty').value]), m=Array.from({length:N},()=>Array(N).fill(1));
